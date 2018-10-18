@@ -203,7 +203,7 @@ public class TransactionClient {
 				+ "\namount=" + amount.getValue());
 	}
 
-	////////// 获取交易信息
+	////////// 获取指定合约地址交易
 	public static void getTransfer() {
 		String url = "https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=0xc54083e77f913a4f99e1232ae80c318ff03c9d17&address=0x897081cb98b838b4fff8a1fceec4fad188ca9281&page=1&offset=4&sort=desc";
 		try {
@@ -220,6 +220,9 @@ public class TransactionClient {
 		}
 
 	}
+	// https://api.etherscan.io/api?module=account&action=txlist&address=0x897081cb98b838b4fff8a1fceec4fad188ca9281&offset=10&sort=desc&page=3
+// 查出所有的交易 包括了单个资产的交易记录 但是value为0。inputdata 为0x时ETH转账 其他时需要解析内容包括了资产交易地址和转账金额 isError 判断交易是否失败
+
 
 //	  $.ajax({
 //          dataType: "json",
@@ -256,26 +259,28 @@ public class TransactionClient {
 			for (int i = 0; i < jsonArray.size(); i++) {
 				String backJson = jsonArray.getString(i);
 				int tlenght = backJson.split("\t").length;
-				String label = null,value = null,desc = null,typeval = null,checkMark = null,logo = null;
+				String label = null,value = null,desc = null,typeval = null,checkMark = null,logo = null,code=null;
 				if (tlenght > 0) {
 					 label = backJson.split("\t")[0];
+					code= label.substring( label.indexOf("(")+1,label.indexOf(")"));
+					label=label.substring(0, label.indexOf("("));
 				}
 				if (tlenght > 1) {
 					 value = backJson.split("\t")[1];
 				}
-				if (tlenght > 2) {
-					 desc = backJson.split("\t")[2];
-				}
-				if (tlenght > 3) {
-					 typeval = backJson.split("\t")[3];
-				}
-				if (tlenght > 4) {
-					 checkMark = backJson.split("\t")[4];
-				}
+//				if (tlenght > 2) {
+//					 desc = backJson.split("\t")[2];
+//				}
+//				if (tlenght > 3) {
+//					 typeval = backJson.split("\t")[3];
+//				}
+//				if (tlenght > 4) {
+//					 checkMark = backJson.split("\t")[4];
+//				}
 				if (tlenght > 5) {
 					 logo = backJson.split("\t")[5];
 				}
-				System.out.println("label:" + label + " value: " + value + "  desc:" + desc + " typeval:" + typeval
+				System.out.println("label:" + label+"  code " +code+ " value: " + value + "  desc:" + desc + " typeval:" + typeval
 						+ " checkMark:" + checkMark + " logo: " + logo);
 			}
 		} catch (Exception e) {
