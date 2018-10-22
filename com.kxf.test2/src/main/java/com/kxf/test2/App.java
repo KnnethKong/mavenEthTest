@@ -13,10 +13,10 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class App {
 	public static void main(String[] args) {
-		
+		getCoins();
 	}
-	
-	private void getCoins() {
+
+	public static void getCoins() {
 		try {
 			String html = SimpleHttpUtils.get(
 					"https://etherscan.io/tokenholdingsHandler.ashx?&a=0x897081cb98b838b4fff8a1fceec4fad188ca9281&q=&p=1&f=0&h=0&sort=total_price_usd&order=desc&pUsd24hrs=&pBtc24hrs=&pUsd=&fav=");
@@ -26,18 +26,25 @@ public class App {
 			Document document = Jsoup.parse(stringBuffer.toString());
 			Elements document2 = document.select("tr");
 			for (Element element3 : document2) {
-
-				String tokenAddress = element3.getElementsByClass("hex address-tag").select("a").html();
-				String tokenName = element3.getElementsByClass("rounded-x").get(0).html();
-				String tokenImage =		element3.select("img").get(0).attr("src");
-				String tokenNum=element3.getElementsByAttribute("position:relative").html();
-				
-				//String tokenNum = element3.select("td").get(3).html();
-				System.err.println(tokenAddress);
-				System.err.println(tokenName);
-				System.err.println(tokenImage);
-				System.err.println(tokenNum);
-
+				Elements addreEles = element3.getElementsByClass("addresstag");
+				Element addreEle = addreEles.get(0).child(0);
+				String src = addreEle.childNode(0).attr("src");
+				String tokenCode = null, tokenName = null, tokenNum = null, tokenImg = null;
+				if (src == null || src.equals("")) {
+					Element element5 = addreEle.child(0);
+					tokenImg = element5.attr("href");
+					tokenName = element5.html();
+				} else {// eth
+					String htmls = addreEle.html();
+					tokenName = htmls.substring(htmls.indexOf(">") + 1, htmls.length());
+					tokenImg=src;
+				}
+				Element element = (Element) element3.child(3);
+				if (element != null) {
+					tokenNum = element.html();
+				}
+				tokenCode=tokenName.substring(tokenName.indexOf("(")-1, tokenName.indexOf(")"));
+				System.out.println( tokenName +"   "+tokenCode+"    "+tokenImg+"    "+tokenNum);
 			}
 
 		} catch (Exception e) {
@@ -45,5 +52,5 @@ public class App {
 		}
 
 	}
-	
+
 }
